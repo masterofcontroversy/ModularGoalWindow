@@ -1,0 +1,21 @@
+#ifdef _FE8_
+    #include "EAstdlib.event"
+    #define FreeSpace 0xb2a610
+    #define FreeSpaceBLRange 0x1c1ec0
+    
+    ORG FreeSpace
+    
+    PUSH
+    
+    ORG 0x8B091C
+    BYTE 6
+    
+    POP
+    
+    //ModularGoalWindow
+    #include "C_Wizardry/ModularGoalWindow/Installer.event"
+    
+    MESSAGE Used free space ends at currentOffset
+#else
+    ERROR Not building this on FE8 is a pitfall! Try again on a FE8 ROM.
+#endif
