@@ -80,9 +80,9 @@ void DrawGoalWindow(struct PiProc* proc) {
     if (MGWOptions[gwIndex].charIndex != 0) {
         DrawSpecialUiChar(TM_FOREGROUND + TILEMAP_INDEX(MGWOptions[gwIndex].charX, MGWOptions[gwIndex].charY), MGWOptions[gwIndex].charColor, MGWOptions[gwIndex].charIndex);
     }
-    //TODO Fix the palette problem
-    //If either the byte that decides if the template is using an icon, or the byte used to decide what icon to use is 0, don't draw any icon
-    //Icon specs are determined in EA
+    //TODO: Fix the palette problem
+    //If either the byte that decides if the template is using an icon is set to 0, or the RAM byte that determines what icon to display is 0xFF, don't draw any icon
+    //Icon location is determined in EA
     if (MGWOptions[gwIndex].iconIndex != 0 && FreeByte != 0xFF) {
         DrawIcon(TM_FOREGROUND + TILEMAP_INDEX(MGWOptions[gwIndex].iconX, MGWOptions[gwIndex].iconY), FreeByte, 0xD000);
         LoadIconPalette(MGWOptions[gwIndex].iconPal, 0xD);
@@ -90,11 +90,24 @@ void DrawGoalWindow(struct PiProc* proc) {
     
 }
 
-//Ease of use function
+//Ease of use function for inserting numbers in textHandles
 void InsertNumber(struct TextHandle* handle, int xCursor, int color, int number) {
     Text_SetXCursor(handle, xCursor); //XCursor is how far to the right your text is located
     Text_SetColorId(handle, color); //Color of the text
     Text_DrawNumber(handle, number); //Adding number text to the text handle
+}
+
+//Two line display
+void TwoLineTextTemplate(struct PiProc* proc) {
+    int gwIndex = GetChapterDefinition(gChapterData.chapterIndex)->goalWindowDataType;
+    
+    Text_Clear(&proc->textA);
+    Text_InsertString(&proc->textA, 0x6, TEXT_COLOR_NORMAL, GetStringFromIndex(MGWText[gwIndex].indexA));
+    
+    Text_Clear(&proc->textB);
+    Text_InsertString(&proc->textB, 0x6, TEXT_COLOR_NORMAL, GetStringFromIndex(MGWText[gwIndex].indexB));
+    
+    proc->bottomPadding = 1;
 }
 
 //Display gold only
@@ -102,7 +115,7 @@ void GoldTextTemplate(struct PiProc* proc) {
     Text_Clear(&proc->textA); //Clearing text from textA
     InsertNumber(&proc->textA, 0x36, TEXT_COLOR_BLUE, GetPartyGoldAmount());
     
-    proc->bottomPadding = 0; //Set to 0 for small window, and 1 for big window. (textB will not be displayed with a small window)
+    proc->bottomPadding = 0; //Set to 0 for small window, or 1 for big window. (textB will not be displayed with a small window)
 }
 
 //Display gold and current turn
@@ -116,18 +129,6 @@ void GoldTurnTextTemplate(struct PiProc* proc) {
     Text_InsertString(&proc->textB, 0xC, TEXT_COLOR_NORMAL, GetStringFromIndex(MGWText[gwIndex].indexB)); //Works the same as InsertNumber, but with regular text
     
     InsertNumber(&proc->textB, 0x30, TEXT_COLOR_BLUE, gChapterData.turnNumber);
-    
-    proc->bottomPadding = 1;
-}
-
-void TwoLineTextTemplate(struct PiProc* proc) {
-    int gwIndex = GetChapterDefinition(gChapterData.chapterIndex)->goalWindowDataType;
-    
-    Text_Clear(&proc->textA);
-    Text_InsertString(&proc->textA, 0x6, TEXT_COLOR_NORMAL, GetStringFromIndex(MGWText[gwIndex].indexB));
-    
-    Text_Clear(&proc->textB);
-    Text_InsertString(&proc->textB, 0x6, TEXT_COLOR_NORMAL, GetStringFromIndex(MGWText[gwIndex].indexB));
     
     proc->bottomPadding = 1;
 }

@@ -3,10 +3,10 @@
 08B2A745 GoldTextTemplate
 08B2A77D GoldTurnTextTemplate
 08B2A809 TwoLineTextTemplate
-08B2A894 GoldDisplay
-08B2A8A0 GoldTurnDisplay
-08B2A8AC TwoLineDisplay
-08B2A8B8 NewGoalWindowjpt
-08B2A8D8 MGWOptions
-08B2A918 MGWText
-08B2A938 SetMGWIcon
+08B2A89C TwoLineDisplay
+08B2A8A8 GoldDisplay
+08B2A8B4 GoldTurnDisplay
+08B2A8C0 NewGoalWindowjpt
+08B2A8E0 MGWOptions
+08B2A920 MGWText
+08B2A940 SetMGWIcon
