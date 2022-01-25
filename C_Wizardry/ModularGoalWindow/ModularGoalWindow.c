@@ -1,23 +1,26 @@
 #include "gbafe.h"
 
+typedef struct ROMChapterData ROMChapterData;
+typedef struct goalOptions goalOptions;
+
 struct goalOptions {
-    u8 charIndex;
-    u8 charColor;
-    u8 charX;
-    u8 charY;
-    u8 iconIndex;
-    u8 iconPal;
-    u8 iconX;
-    u8 iconY;
+/* 00 */ u8 charIndex;
+/* 01 */ u8 charColor;
+/* 02 */ u8 charX;
+/* 03 */ u8 charY;
+/* 04 */ u8 iconIndex;
+/* 05 */ u8 iconPal;
+/* 06 */ u8 iconX;
+/* 07 */ u8 iconY;
 };
 
 struct textIndexes {
-    u16 indexA;
-    u16 indexB;
+/* 00 */ u16 indexA;
+/* 04 */ u16 indexB;
 };
 
 //Vanilla function for getting ROM chapter data
-extern struct ROMChapterData* GetChapterDefinition(int index);
+extern ROMChapterData* GetChapterDefinition(int index);
 
 //Byte used for the icon ID
 extern u8 FreeByte;
@@ -58,8 +61,12 @@ static u16 const* const TSA_SMALLWINDOW = (u16 const*) 0x08A17744;
 static u16* const TM_BACKGROUND = (u16*) 0x020044D4;
 static u16* const TM_FOREGROUND = (u16*) 0x02004054;
 
-void DrawGoalWindow(struct PiProc* proc) {
+//ASMC to set the IconID from event slot 1 to freebyte
+void SetMGWIcon() {
+    FreeByte = gEventSlot[1];
+}
 
+void DrawGoalWindow(struct PiProc* proc) {
 	BgMapFillRect(TM_BACKGROUND, 11, 9, 0);
 	BgMapFillRect(TM_FOREGROUND, 11, 9, 0);
 
@@ -74,27 +81,34 @@ void DrawGoalWindow(struct PiProc* proc) {
     }
     
     int gwIndex = GetChapterDefinition(gChapterData.chapterIndex)->goalWindowDataType;
-    
+    goalOptions* options = &MGWOptions[gwIndex];
+
     //If the byte that decides if the template is using a speical character is 0, don't draw any special character
     //Character specs are determined in EA
-    if (MGWOptions[gwIndex].charIndex != 0) {
-        DrawSpecialUiChar(TM_FOREGROUND + TILEMAP_INDEX(MGWOptions[gwIndex].charX, MGWOptions[gwIndex].charY), MGWOptions[gwIndex].charColor, MGWOptions[gwIndex].charIndex);
+    if (options->charIndex != 0) {
+        int charCoords = TILEMAP_INDEX(options->charX, options->charY);
+        DrawSpecialUiChar(
+        TM_FOREGROUND + charCoords,
+        options->charColor,
+        options->charIndex
+        );
     }
     //TODO: Fix the palette problem
-    //If either the byte that decides if the template is using an icon is set to 0, or the RAM byte that determines what icon to display is 0xFF, don't draw any icon
+    //Don't display if template isn't allowed to, or if the icon ID to display is 0xFF
     //Icon location is determined in EA
-    if (MGWOptions[gwIndex].iconIndex != 0 && FreeByte != 0xFF) {
-        DrawIcon(TM_FOREGROUND + TILEMAP_INDEX(MGWOptions[gwIndex].iconX, MGWOptions[gwIndex].iconY), FreeByte, 0xD000);
-        LoadIconPalette(MGWOptions[gwIndex].iconPal, 0xD);
+    if (options->iconIndex != 0 && FreeByte != 0xFF) {
+        int iconCoords = TILEMAP_INDEX(options->iconX, options->iconY);
+        DrawIcon(TM_FOREGROUND + iconCoords, FreeByte, 0xD000);
+        LoadIconPalette(options->iconPal, 0xD);
     }
     
 }
 
 //Ease of use function for inserting numbers in textHandles
 void InsertNumber(struct TextHandle* handle, int xCursor, int color, int number) {
-    Text_SetXCursor(handle, xCursor); //XCursor is how far to the right your text is located
-    Text_SetColorId(handle, color); //Color of the text
-    Text_DrawNumber(handle, number); //Adding number text to the text handle
+    Text_SetXCursor(handle, xCursor);   //XCursor is how far to the right your text is located
+    Text_SetColorId(handle, color);     //Color of the text
+    Text_DrawNumber(handle, number);    //Adding number text to the text handle
 }
 
 //Two line display
@@ -115,7 +129,8 @@ void GoldTextTemplate(struct PiProc* proc) {
     Text_Clear(&proc->textA); //Clearing text from textA
     InsertNumber(&proc->textA, 0x36, TEXT_COLOR_BLUE, GetPartyGoldAmount());
     
-    proc->bottomPadding = 0; //Set to 0 for small window, or 1 for big window. (textB will not be displayed with a small window)
+    //Set to 0 for small window, or 1 for big window. (textB will not be displayed with a small window)
+    proc->bottomPadding = 0;
 }
 
 //Display gold and current turn
@@ -126,7 +141,9 @@ void GoldTurnTextTemplate(struct PiProc* proc) {
     InsertNumber(&proc->textA, 0x36, TEXT_COLOR_BLUE, GetPartyGoldAmount());
     
     Text_Clear(&proc->textB);
-    Text_InsertString(&proc->textB, 0xC, TEXT_COLOR_NORMAL, GetStringFromIndex(MGWText[gwIndex].indexB)); //Works the same as InsertNumber, but with regular text
+
+    //Works the same as InsertNumber, but with regular text
+    Text_InsertString(&proc->textB, 0xC, TEXT_COLOR_NORMAL, GetStringFromIndex(MGWText[gwIndex].indexB));
     
     InsertNumber(&proc->textB, 0x30, TEXT_COLOR_BLUE, gChapterData.turnNumber);
     
