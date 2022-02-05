@@ -32,6 +32,12 @@ $RECYCLE.BIN/
 *.ss8
 *.ss9
 
+# tools folder
+Tools/**
+
+# nocash syms
+*.sym
+
 # python cache
 __pycache__
 
