@@ -1,16 +1,9 @@
-#include "gbafe.h"
+#include "ModularGoalWindow.h"
 
 //Adapted from Stan's FE7 version
 
 //TODO: Add a target time argument to count down too
 //TODO: Handle negative numbers for the clock text
-
-struct ClockTextProc {
-    /* 00 */ PROC_HEADER;
-    /* 29 */ u8 x;
-    /* 2A */ u16 clock;
-    /* 2C */ struct TextHandle* text;
-};
 
 void UpdateClockText(struct ClockTextProc* proc);
 

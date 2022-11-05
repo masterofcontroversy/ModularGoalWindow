@@ -1,35 +1,4 @@
-#include "gbafe.h"
-
-typedef struct ROMChapterData ROMChapterData;
-typedef struct goalOptions goalOptions;
-
-struct goalOptions {
-/* 00 */ u8 charIndex;
-/* 01 */ u8 charColor;
-/* 02 */ u8 charX;
-/* 03 */ u8 charY;
-/* 04 */ u8 iconIndex;
-/* 05 */ u8 iconPal;
-/* 06 */ u8 iconX;
-/* 07 */ u8 iconY;
-};
-
-struct textIndexes {
-/* 00 */ u16 indexA;
-/* 04 */ u16 indexB;
-};
-
-//Options and textIDs set in EA
-extern void StartClockText(TextHandle* text, int x, GoalWindowProc* parent);
-
-extern struct goalOptions MGWOptions[0xFF];
-extern struct textIndexes MGWText[0xFF];
-
-static u16 const* const TSA_BIGWINDOW = (u16 const*) 0x08A176BC;
-static u16 const* const TSA_SMALLWINDOW = (u16 const*) 0x08A17744;
-
-static u16* const TM_BACKGROUND = (u16*) 0x020044D4;
-static u16* const TM_FOREGROUND = (u16*) 0x02004054;
+#include "ModularGoalWindow.h"
 
 //ASMC to set the IconID from event slot 1 to freebyte
 void SetMGWIcon() {
@@ -116,5 +85,28 @@ void GoldTurnTextTemplate(struct GoalWindowProc* proc) {
     
     InsertNumber(&proc->textB, 0x30, TEXT_COLOR_BLUE, gChapterData.turnNumber);
     
+    proc->bottomPadding = 1;
+}
+
+void EnemyAndTurnCountTemplate(GoalWindowProc* proc) {
+    u16 textIndexA = MGWText[gChapterData.chapterIndex].indexA;
+    u16 textIndexB = MGWText[gChapterData.chapterIndex].indexB;
+
+    Text_Clear(&proc->textA);
+    Text_Clear(&proc->textB);
+
+    Text_InsertString(&proc->textA, 0x8, TEXT_COLOR_NORMAL, GetStringFromIndex(textIndexA));
+    InsertNumber(&proc->textA, 0x34, TEXT_COLOR_BLUE, CountUnitsByFaction(UA_RED));
+
+    if (gChapterData.turnNumber < GetChapterDefinition(gChapterData.chapterIndex)->goalWindowEndTurnNumber) {
+        Text_InsertString(&proc->textB, 0x2, TEXT_COLOR_NORMAL, GetStringFromIndex(textIndexB));
+        InsertNumber(&proc->textB, 0x20, TEXT_COLOR_BLUE, gChapterData.turnNumber);
+        Text_InsertString(&proc->textB, 0x28, TEXT_COLOR_NORMAL, "/");
+        InsertNumber(&proc->textB, 0x38, TEXT_COLOR_BLUE, GetChapterDefinition(gChapterData.chapterIndex)->goalWindowEndTurnNumber);
+    }
+    else {
+        Text_InsertString(&proc->textB, 0xC, TEXT_COLOR_GREEN, GetStringFromIndex(0x01C3)); //Last Turn
+    }
+
     proc->bottomPadding = 1;
 }

@@ -21,13 +21,13 @@
 #define G_Character 30
 
 PUSH
-	
-	ORG 0x8D32B
-	BYTE 7 //Number of goal window templates (Starting count at 0)
-	
-	// New Goal window
-	ORG $08D200
-		WORD $46C04778 $E59FC000 $E12FFF1C; POIN DrawGoalWindow
+    
+    ORG 0x8D32B
+    BYTE 8 //Number of goal window templates (Starting count at 0)
+
+    // New Goal window
+    ORG $08D200
+        WORD $46C04778 $E59FC000 $E12FFF1C; POIN DrawGoalWindow
     
     ORG $8D33C
     POIN NewGoalWindowjpt
@@ -45,6 +45,10 @@ ALIGN 4
 GoldTurnDisplay:
     GoalWindowTemplate(GoldTurnTextTemplate)
 
+ALIGN 4
+EnemyAndTurnCountDisplay:
+    GoalWindowTemplate(EnemyAndTurnCountTemplate)
+
 NewGoalWindowjpt:
 /*0x0*/ WORD 0x0808D354 // Single line display (Seize)
 /*0x1*/ WORD 0x0808D35C // Route
@@ -54,6 +58,7 @@ NewGoalWindowjpt:
 /*0x5*/ POIN TwoLineDisplay
 /*0x6*/ POIN GoldDisplay
 /*0x7*/ POIN GoldTurnDisplay
+/*0x8*/ POIN EnemyAndTurnCountDisplay
 
 //NOTE: "IsIcon" is only used to decide whether or not to display an icon ever. Use the SetMGWIcon ASMC to set an Icon by ID
 MGWOptions:
@@ -65,3 +70,4 @@ MGWOptions:
 /*0x5*/ WORD 0 0
 /*0x6*/ SetWindowOptions(G_Character,OrangeText,9,1, 0x0,1,1,1)
 /*0x7*/ SetWindowOptions(G_Character,OrangeText,9,1, 0x1,1,8,3)
+/*0x8*/ WORD 0 0
