@@ -110,3 +110,11 @@ void EnemyAndTurnCountTemplate(GoalWindowProc* proc) {
 
     proc->bottomPadding = 1;
 }
+
+void RealTimeClockDisplayTemplate(GoalWindowProc* proc) {
+    Text_Clear(&proc->textA);
+
+    StartClockText(&proc->textA, 0xC, proc);
+
+    proc->bottomPadding = 0;
+}

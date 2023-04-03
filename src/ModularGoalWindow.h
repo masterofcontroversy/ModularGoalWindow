@@ -2,13 +2,15 @@
 
 typedef struct ROMChapterData ROMChapterData;
 typedef struct goalOptions goalOptions;
+typedef struct GoalWindowProc GoalWindowProc;
+typedef struct ClockTextProc ClockTextProc;
 
 struct GoalWindowProc {
     /* 00 */ PROC_HEADER;
 
     /* 2A */ u16 pad2A;
-    /* 2C */ struct TextHandle textA;
-    /* 34 */ struct TextHandle textB;
+    /* 2C */ TextHandle textA;
+    /* 34 */ TextHandle textB;
     /* 3C */ u8 pad3C[0x44 - 0x3C];
 
     /* 44 */ u16 bottomPadding;
@@ -33,7 +35,7 @@ struct ClockTextProc {
     /* 00 */ PROC_HEADER;
     /* 29 */ u8 x;
     /* 2A */ u16 clock;
-    /* 2C */ struct TextHandle* text;
+    /* 2C */ TextHandle* text;
 };
 
 struct goalOptions {
@@ -53,7 +55,8 @@ struct textIndexes {
 };
 
 //Draw Time Text
-extern void StartClockText(TextHandle* text, int x, GoalWindowProc* parent);
+void StartClockText(TextHandle* text, int x, GoalWindowProc* parent);
+void UpdateClockText(ClockTextProc* proc);
 
 extern int CountUnitsByFaction(u8 factionBit);
 
@@ -65,3 +68,8 @@ static u16 const* const TSA_SMALLWINDOW = (u16 const*) 0x08A17744;
 
 static u16* const TM_BACKGROUND = (u16*) 0x020044D4;
 static u16* const TM_FOREGROUND = (u16*) 0x02004054;
+
+struct ProcInstruction const ClockTextProcInstruction[] = {
+    PROC_LOOP_ROUTINE(UpdateClockText),
+    PROC_END,
+};
