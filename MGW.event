@@ -5,7 +5,7 @@
 #include "src/DrawTimeText.lyn.event"
 
 #define GoalWindowTemplate(Template) "SHORT $1C30; BL(Template); SHORT $BCF0 $BC01 $4700"
-#define SetWindowOptions(Char,CharColor,CharX,CharY, IsIcon,IconPal,IconX,IconY) "BYTE Char CharColor CharX CharY IsIcon IconPal IconX IconY"
+#define SetWindowOptions(Character,CharColor,CharX,CharY, IsIcon,IconPal,IconX,IconY) "BYTE Character CharColor CharX CharY IsIcon IconPal IconX IconY"
 #define GoalWindowText(TextA, TextB) "SHORT TextA TextB"
 
 //Color definitions. Remove if you already have them defined
