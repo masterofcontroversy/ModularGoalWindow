@@ -69,7 +69,3 @@ static u16 const* const TSA_SMALLWINDOW = (u16 const*) 0x08A17744;
 static u16* const TM_BACKGROUND = (u16*) 0x020044D4;
 static u16* const TM_FOREGROUND = (u16*) 0x02004054;
 
-struct ProcInstruction const ClockTextProcInstruction[] = {
-    PROC_LOOP_ROUTINE(UpdateClockText),
-    PROC_END,
-};

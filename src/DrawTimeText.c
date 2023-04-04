@@ -5,6 +5,11 @@
 //TODO: Add a target time argument to count down to
 //TODO: Handle negative numbers for the clock text
 
+struct ProcInstruction const ClockTextProcInstruction[] = {
+    PROC_LOOP_ROUTINE(UpdateClockText),
+    PROC_END,
+};
+
 //Helper function to draw a number as two digits
 static void DrawNumber2Chars(struct TextHandle* text, u16 number) {
     char digit_a = '0' + __modsi3(number, 10);
